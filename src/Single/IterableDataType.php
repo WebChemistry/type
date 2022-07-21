@@ -7,9 +7,9 @@ use WebChemistry\Type\DataType;
 final class IterableDataType extends SingleDataTypeAbstract
 {
 
-	public function allows(DataType $type): bool
+	public function allowsType(DataType $type): bool
 	{
-		return parent::allows($type) || $type instanceof ArrayDataType;
+		return parent::allowsType($type) || $type instanceof ArrayDataType;
 	}
 
 }

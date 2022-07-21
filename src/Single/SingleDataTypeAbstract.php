@@ -3,6 +3,7 @@
 namespace WebChemistry\Type\Single;
 
 use WebChemistry\Type\DataType;
+use WebChemistry\Type\DataTypeFactory;
 use WebChemistry\Type\SingleDataType;
 
 abstract class SingleDataTypeAbstract implements SingleDataType
@@ -10,6 +11,7 @@ abstract class SingleDataTypeAbstract implements SingleDataType
 
 	final public function __construct(
 		protected string $type,
+		protected DataTypeFactory $dataTypeFactory,
 	)
 	{
 	}
@@ -24,7 +26,12 @@ abstract class SingleDataTypeAbstract implements SingleDataType
 		return true;
 	}
 
-	public function equalTo(DataType $type): bool
+	public function equalTo(string $type): bool
+	{
+		return $this->equalToType($this->dataTypeFactory->createFromString($type));
+	}
+
+	public function equalToType(DataType $type): bool
 	{
 		if (!$type->isSingle()) {
 			return false;
@@ -33,9 +40,30 @@ abstract class SingleDataTypeAbstract implements SingleDataType
 		return $type->toString() === $this->type;
 	}
 
-	public function allows(DataType $type): bool
+	public function allows(string $type): bool
+	{
+		return $this->allowsType($this->dataTypeFactory->createFromString($type));
+	}
+
+	public function allowsType(DataType $type): bool
 	{
 		return $type->toString() === $this->type;
+	}
+
+	public function allowsAny(string ...$types): bool
+	{
+		return $this->allowsAnyTypes(...array_map($this->dataTypeFactory->createFromString(...), $types));
+	}
+
+	public function allowsAnyTypes(DataType ...$types): bool
+	{
+		foreach ($types as $type) {
+			if ($this->allowsType($type)) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/**

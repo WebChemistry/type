@@ -13,6 +13,6 @@ interface DataTypeFactory
 
 	public function createFromReflection(
 		ReflectionFunctionAbstract|ReflectionParameter|ReflectionProperty $reflection,
-	): DataType;
+	): ?DataType;
 
 }

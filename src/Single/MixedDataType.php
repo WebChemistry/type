@@ -7,7 +7,7 @@ use WebChemistry\Type\DataType;
 final class MixedDataType extends SingleDataTypeAbstract
 {
 
-	public function allows(DataType $type): bool
+	public function allowsType(DataType $type): bool
 	{
 		return true;
 	}

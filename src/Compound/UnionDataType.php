@@ -5,6 +5,7 @@ namespace WebChemistry\Type\Compound;
 use Nette\Utils\Arrays;
 use WebChemistry\Type\CompoundDataType;
 use WebChemistry\Type\DataType;
+use WebChemistry\Type\DataTypeFactory;
 use WebChemistry\Type\Single\SingleDataTypeAbstract;
 
 final class UnionDataType implements CompoundDataType
@@ -15,6 +16,7 @@ final class UnionDataType implements CompoundDataType
 	 */
 	public function __construct(
 		private array $types,
+		private DataTypeFactory $dataTypeFactory,
 	)
 	{
 	}
@@ -44,7 +46,12 @@ final class UnionDataType implements CompoundDataType
 		return $names;
 	}
 
-	public function equalTo(DataType $type): bool
+	public function equalTo(string $type): bool
+	{
+		return $this->equalToType($this->dataTypeFactory->createFromString($type));
+	}
+
+	public function equalToType(DataType $type): bool
 	{
 		if ($type->isSingle()) {
 			return false;
@@ -54,10 +61,15 @@ final class UnionDataType implements CompoundDataType
 			return false;
 		}
 
-		return $this->allows($type);
+		return $this->allowsType($type);
 	}
 
-	public function allows(DataType $type): bool
+	public function allows(string $type): bool
+	{
+		return $this->allowsType($this->dataTypeFactory->createFromString($type));
+	}
+
+	public function allowsType(DataType $type): bool
 	{
 		if ($type->isSingle() && $type->toString() === 'mixed') {
 			return false;
@@ -67,9 +79,25 @@ final class UnionDataType implements CompoundDataType
 			$type->getSingleTypes(),
 			fn (DataType $testedType) => Arrays::some(
 				$this->types,
-				fn (DataType $currentType) => $currentType->allows($testedType),
+				fn (DataType $currentType) => $currentType->allowsType($testedType),
 			)
 		);
+	}
+
+	public function allowsAny(string ...$types): bool
+	{
+		return $this->allowsAnyTypes(...array_map($this->dataTypeFactory->createFromString(...), $types));
+	}
+
+	public function allowsAnyTypes(DataType ...$types): bool
+	{
+		foreach ($types as $type) {
+			if ($this->allowsType($type)) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/**

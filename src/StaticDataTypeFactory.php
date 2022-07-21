@@ -13,10 +13,13 @@ use ReflectionParameter;
 use ReflectionProperty;
 use ReflectionUnionType;
 use WebChemistry\Type\Compound\UnionDataType;
-use WebChemistry\Type\StaticSingleDataTypeFactory;
 
 final class StaticDataTypeFactory
 {
+
+	private static DataTypeFactory $factory;
+
+	private static DefaultSingleDataTypeFactory $singleTypeFactory;
 
 	public static function fromString(string $type): DataType
 	{
@@ -29,11 +32,11 @@ final class StaticDataTypeFactory
 		}
 
 		$types = array_map(
-			fn (string $type) => StaticSingleDataTypeFactory::create($type),
+			fn (string $type) => self::getSingleTypeFactory()->create($type),
 			explode('|', $type),
 		);
 
-		return count($types) > 1 ? new UnionDataType($types) : $types[0];
+		return count($types) > 1 ? new UnionDataType($types, self::getFactory()) : $types[0];
 	}
 
 	public static function fromReflection(
@@ -56,22 +59,22 @@ final class StaticDataTypeFactory
 
 			if ($type->allowsNull() && $type->getName() !== 'mixed') {
 				return new UnionDataType([
-					StaticSingleDataTypeFactory::create($name),
-					StaticSingleDataTypeFactory::create('null')
-				]);
+					self::getSingleTypeFactory()->create($name),
+					self::getSingleTypeFactory()->create('null'),
+				], self::getFactory());
 			}
 
-			return StaticSingleDataTypeFactory::create($name);
+			return self::getSingleTypeFactory()->create($name);
 
 		} elseif ($type instanceof ReflectionUnionType) {
 			$types = array_map(
-				fn (ReflectionNamedType $t) => StaticSingleDataTypeFactory::create(
+				fn (ReflectionNamedType $t) => self::getSingleTypeFactory()->create(
 					self::resolve($t->getName(), $reflection)
 				),
 				$type->getTypes()
 			);
 
-			return new UnionDataType($types);
+			return new UnionDataType($types, self::getFactory());
 
 		} elseif ($type instanceof ReflectionIntersectionType) {
 			throw new LogicException(sprintf('Intersections are not currently supported.'));
@@ -97,6 +100,16 @@ final class StaticDataTypeFactory
 		} else {
 			return $type;
 		}
+	}
+
+	private static function getSingleTypeFactory(): DefaultSingleDataTypeFactory
+	{
+		return self::$singleTypeFactory ??= new DefaultSingleDataTypeFactory(self::getFactory());
+	}
+
+	private static function getFactory(): DataTypeFactory
+	{
+		return self::$factory ??= new DefaultDataTypeFactory();
 	}
 
 }

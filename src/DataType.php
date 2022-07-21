@@ -12,9 +12,17 @@ interface DataType
 	 */
 	public function getNames(): array;
 
-	public function allows(DataType $type): bool;
+	public function allows(string $type): bool;
 
-	public function equalTo(DataType $type): bool;
+	public function allowsAny(string ... $types): bool;
+
+	public function allowsType(DataType $type): bool;
+
+	public function allowsAnyTypes(DataType ... $types): bool;
+
+	public function equalTo(string $type): bool;
+
+	public function equalToType(DataType $type): bool;
 
 	/**
 	 * @return DataType[]

@@ -16,7 +16,7 @@ final class DefaultDataTypeFactory implements DataTypeFactory
 
 	public function createFromReflection(
 		ReflectionFunctionAbstract|ReflectionParameter|ReflectionProperty $reflection,
-	): DataType
+	): ?DataType
 	{
 		return StaticDataTypeFactory::fromReflection($reflection);
 	}

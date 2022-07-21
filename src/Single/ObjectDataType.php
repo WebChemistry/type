@@ -7,7 +7,7 @@ use WebChemistry\Type\DataType;
 final class ObjectDataType extends SingleDataTypeAbstract
 {
 
-	public function allows(DataType $type): bool
+	public function allowsType(DataType $type): bool
 	{
 		return !$type->isBuiltin() || $type instanceof ObjectDataType;
 	}

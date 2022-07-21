@@ -19,7 +19,7 @@ use WebChemistry\Type\Single\SingleDataTypeAbstract;
 use WebChemistry\Type\Single\StringDataType;
 use WebChemistry\Type\Single\TrueDataType;
 
-final class StaticSingleDataTypeFactory
+final class DefaultSingleDataTypeFactory
 {
 
 	private const BUILTIN = [
@@ -39,16 +39,22 @@ final class StaticSingleDataTypeFactory
 		'resource' => ResourceDataType::class,
 	];
 
-	public static function create(string $type): SingleDataTypeAbstract
+	public function __construct(
+		private DataTypeFactory $dataTypeFactory,
+	)
+	{
+	}
+
+	public function create(string $type): SingleDataTypeAbstract
 	{
 		$type = ltrim(trim($type), '\\');
 		$lowerType = strtolower($type);
 
 		if (isset(self::BUILTIN[$lowerType])) {
-			return new (self::BUILTIN[$lowerType])($lowerType);
+			return new (self::BUILTIN[$lowerType])($lowerType, $this->dataTypeFactory);
 		}
 
-		return new ClassDataType($type);
+		return new ClassDataType($type, $this->dataTypeFactory);
 	}
 
 }

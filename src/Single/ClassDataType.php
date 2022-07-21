@@ -15,7 +15,7 @@ final class ClassDataType extends SingleDataTypeAbstract
 		return false;
 	}
 
-	public function allows(DataType $type): bool
+	public function allowsType(DataType $type): bool
 	{
 		if ($type->isBuiltin()) {
 			return false;

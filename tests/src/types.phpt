@@ -99,31 +99,36 @@ test('allowsAndEqualTo', function () use ($factory): void {
 	];
 
 	foreach ($test as $expected => [$passedTrue, $passedFalse]) {
-		Assert::true($factory->createFromString($expected)->allows($factory->createFromString($expected)));
-		Assert::true($factory->createFromString($expected)->equalTo($factory->createFromString($expected)));
+		Assert::true($factory->createFromString($expected)->allows($expected));
+		Assert::true($factory->createFromString($expected)->equalTo($expected));
 
 		foreach ($passedTrue as $item) {
 			Assert::true(
-				$factory->createFromString($expected)->allows($factory->createFromString($item)),
+				$factory->createFromString($expected)->allows($item),
 				sprintf('Trying pass %s to %s.', $item, $expected)
 			);
 			Assert::false(
-				$factory->createFromString($expected)->equalTo($factory->createFromString($item)),
+				$factory->createFromString($expected)->equalTo($item),
 				sprintf('Trying pass %s to %s.', $item, $expected)
 			);
 		}
 
 		foreach ($passedFalse as $item) {
 			Assert::false(
-				$factory->createFromString($expected)->allows($factory->createFromString($item)),
+				$factory->createFromString($expected)->allows($item),
 				sprintf('Trying pass %s to %s.', $item, $expected)
 			);
 			Assert::false(
-				$factory->createFromString($expected)->equalTo($factory->createFromString($item)),
+				$factory->createFromString($expected)->equalTo($item),
 				sprintf('Trying pass %s to %s.', $item, $expected)
 			);
 		}
 	}
 });
 
-var_dump($factory->createFromString('array<string>'));
+test('any', function () use ($factory): void {
+	$type = $factory->createFromString(DateTimeInterface::class);
+
+	Assert::true($type->allowsAny(DateTime::class, 'false'));
+	Assert::true($type->allowsAny('false', DateTimeImmutable::class));
+});
