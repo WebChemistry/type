@@ -2,7 +2,7 @@
 
 namespace WebChemistry\Type;
 
-interface SingleDataType extends DataType
+interface CompoundDataType extends DataType
 {
 
 }

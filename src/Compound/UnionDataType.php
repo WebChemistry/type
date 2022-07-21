@@ -1,14 +1,17 @@
 <?php declare(strict_types = 1);
 
-namespace WebChemistry\Type;
+namespace WebChemistry\Type\Compound;
 
 use Nette\Utils\Arrays;
+use WebChemistry\Type\CompoundDataType;
+use WebChemistry\Type\DataType;
+use WebChemistry\Type\Single\SingleDataTypeAbstract;
 
-final class UnionDataType implements DataType
+final class UnionDataType implements CompoundDataType
 {
 
 	/**
-	 * @param DataType[] $types
+	 * @param SingleDataTypeAbstract[] $types
 	 */
 	public function __construct(
 		private array $types,
@@ -61,10 +64,10 @@ final class UnionDataType implements DataType
 		}
 
 		return Arrays::every(
-			$type->getTypes(),
+			$type->getSingleTypes(),
 			fn (DataType $testedType) => Arrays::some(
 				$this->types,
-				fn (DataType $currentType) => $testedType->allows($currentType),
+				fn (DataType $currentType) => $currentType->allows($testedType),
 			)
 		);
 	}
@@ -78,7 +81,7 @@ final class UnionDataType implements DataType
 	}
 
 	/**
-	 * @return DataType[]
+	 * @return SingleDataTypeAbstract[]
 	 */
 	public function getSingleTypes(): array
 	{

@@ -12,6 +12,8 @@ use ReflectionNamedType;
 use ReflectionParameter;
 use ReflectionProperty;
 use ReflectionUnionType;
+use WebChemistry\Type\Compound\UnionDataType;
+use WebChemistry\Type\StaticSingleDataTypeFactory;
 
 final class StaticDataTypeFactory
 {
@@ -27,7 +29,7 @@ final class StaticDataTypeFactory
 		}
 
 		$types = array_map(
-			fn (string $type) => new SingleDataType($type),
+			fn (string $type) => StaticSingleDataTypeFactory::create($type),
 			explode('|', $type),
 		);
 
@@ -53,14 +55,19 @@ final class StaticDataTypeFactory
 			$name = self::resolve($type->getName(), $reflection);
 
 			if ($type->allowsNull() && $type->getName() !== 'mixed') {
-				return new UnionDataType([new SingleDataType($name), new SingleDataType('null')]);
+				return new UnionDataType([
+					StaticSingleDataTypeFactory::create($name),
+					StaticSingleDataTypeFactory::create('null')
+				]);
 			}
 
-			return new SingleDataType($name);
+			return StaticSingleDataTypeFactory::create($name);
 
 		} elseif ($type instanceof ReflectionUnionType) {
 			$types = array_map(
-				fn (ReflectionNamedType $t) => new SingleDataType(self::resolve($t->getName(), $reflection)),
+				fn (ReflectionNamedType $t) => StaticSingleDataTypeFactory::create(
+					self::resolve($t->getName(), $reflection)
+				),
 				$type->getTypes()
 			);
 
@@ -68,6 +75,7 @@ final class StaticDataTypeFactory
 
 		} elseif ($type instanceof ReflectionIntersectionType) {
 			throw new LogicException(sprintf('Intersections are not currently supported.'));
+
 		} else {
 			throw new InvalidArgumentException('Unexpected type of ' . get_debug_type($reflection));
 		}

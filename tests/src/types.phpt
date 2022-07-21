@@ -2,7 +2,7 @@
 
 use Tester\Assert;
 use WebChemistry\Type\DefaultDataTypeFactory;
-use WebChemistry\Type\SingleDataType;
+use WebChemistry\Type\Single\SingleDataTypeAbstract;
 
 require __DIR__ . '/../bootstrap.php';
 
@@ -34,7 +34,7 @@ test('', function () use ($factory): void {
 	foreach ($builtin as $type) {
 		$object = $factory->createFromString($type);
 
-		Assert::type(SingleDataType::class, $object);
+		Assert::type(SingleDataTypeAbstract::class, $object);
 		Assert::true($object->isSingle());
 		Assert::true($object->isBuiltin());
 		Assert::same(strtolower($type), $object->toString());
@@ -66,9 +66,21 @@ test('allowsAndEqualTo', function () use ($factory): void {
 			[],
 			[union(stdClass::class, 'null'), 'bool', 'mixed'],
 		],
+		'object' => [
+			[stdClass::class],
+			['bool', 'mixed', 'null'],
+		],
+		union('object', 'null') => [
+			[stdClass::class, 'null'],
+			['bool', 'mixed'],
+		],
 		union(stdClass::class, 'null') => [
 			[stdClass::class, 'null'],
 			['bool', union(stdClass::class, 'null', 'bool'), 'mixed'],
+		],
+		'iterable' => [
+			['array'],
+			[],
 		],
 		'mixed' => [
 			[stdClass::class, 'null', 'bool', 'callable', 'true', 'string|null', union(stdClass::class, 'true')],
@@ -103,3 +115,5 @@ test('allowsAndEqualTo', function () use ($factory): void {
 		}
 	}
 });
+
+var_dump($factory->createFromString('array<string>'));

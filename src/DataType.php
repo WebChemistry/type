@@ -2,6 +2,8 @@
 
 namespace WebChemistry\Type;
 
+use WebChemistry\Type\Single\SingleDataTypeAbstract;
+
 interface DataType
 {
 
@@ -20,7 +22,7 @@ interface DataType
 	public function getTypes(): array;
 
 	/**
-	 * @return DataType[]
+	 * @return SingleDataTypeAbstract[]
 	 */
 	public function getSingleTypes(): array;
 
