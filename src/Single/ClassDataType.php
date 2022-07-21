@@ -21,7 +21,7 @@ final class ClassDataType extends SingleDataTypeAbstract
 			return false;
 		}
 
-		return $type->toString() === $this->type || is_a($this->type, $type->toString(), true);
+		return $type->toString() === $this->type || is_a($type->toString(), $this->type, true);
 	}
 
 }

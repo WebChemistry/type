@@ -8,6 +8,8 @@ require __DIR__ . '/../bootstrap.php';
 
 $factory = new DefaultDataTypeFactory();
 
+class A {} class B extends A {} class C extends B {}
+
 function union(string ... $union): string
 {
 	return implode('|', $union);
@@ -85,6 +87,14 @@ test('allowsAndEqualTo', function () use ($factory): void {
 		'mixed' => [
 			[stdClass::class, 'null', 'bool', 'callable', 'true', 'string|null', union(stdClass::class, 'true')],
 			[],
+		],
+		DateTimeInterface::class => [
+			[DateTime::class, DateTimeImmutable::class],
+			[stdClass::class],
+		],
+		B::class => [
+			[C::class],
+			[A::class, 'bool'],
 		],
 	];
 
