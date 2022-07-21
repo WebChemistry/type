@@ -14,6 +14,7 @@ use WebChemistry\Type\Single\MixedDataType;
 use WebChemistry\Type\Single\NeverDataType;
 use WebChemistry\Type\Single\NullDataType;
 use WebChemistry\Type\Single\ObjectDataType;
+use WebChemistry\Type\Single\ResourceDataType;
 use WebChemistry\Type\Single\SingleDataTypeAbstract;
 use WebChemistry\Type\Single\StringDataType;
 use WebChemistry\Type\Single\TrueDataType;
@@ -35,6 +36,7 @@ final class StaticSingleDataTypeFactory
 		'mixed' => MixedDataType::class,
 		'never' => NeverDataType::class,
 		'null' => NullDataType::class,
+		'resource' => ResourceDataType::class,
 	];
 
 	public static function create(string $type): SingleDataTypeAbstract
