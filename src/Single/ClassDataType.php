@@ -4,6 +4,9 @@ namespace WebChemistry\Type\Single;
 
 use WebChemistry\Type\DataType;
 
+/**
+ * @method class-string toString()
+ */
 final class ClassDataType extends SingleDataTypeAbstract
 {
 
