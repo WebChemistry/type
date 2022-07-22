@@ -10,6 +10,8 @@ if (@!include __DIR__ . '/../vendor/autoload.php') {
 	exit(1);
 }
 
+require __DIR__ . '/assert.php';
+
 
 // configure environment
 Tester\Environment::setup();

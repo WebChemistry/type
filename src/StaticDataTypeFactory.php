@@ -13,6 +13,7 @@ use ReflectionParameter;
 use ReflectionProperty;
 use ReflectionUnionType;
 use WebChemistry\Type\Compound\UnionDataType;
+use WebChemistry\Type\Helper\DataTypeHelper;
 
 final class StaticDataTypeFactory
 {
@@ -55,7 +56,7 @@ final class StaticDataTypeFactory
 			return null;
 
 		} elseif ($type instanceof ReflectionNamedType) {
-			$name = self::resolve($type->getName(), $reflection);
+			$name = DataTypeHelper::resolve($type->getName(), $reflection);
 
 			if ($type->allowsNull() && $type->getName() !== 'mixed') {
 				return new UnionDataType([
@@ -69,7 +70,7 @@ final class StaticDataTypeFactory
 		} elseif ($type instanceof ReflectionUnionType) {
 			$types = array_map(
 				fn (ReflectionNamedType $t) => self::getSingleTypeFactory()->create(
-					self::resolve($t->getName(), $reflection)
+					DataTypeHelper::resolve($t->getName(), $reflection)
 				),
 				$type->getTypes()
 			);
@@ -81,24 +82,6 @@ final class StaticDataTypeFactory
 
 		} else {
 			throw new InvalidArgumentException('Unexpected type of ' . get_debug_type($reflection));
-		}
-	}
-
-	private static function resolve(
-		string $type,
-		ReflectionFunctionAbstract|ReflectionParameter|ReflectionProperty $reflection,
-	): string
-	{
-		$lower = strtolower($type);
-
-		if ($reflection instanceof ReflectionFunction) {
-			return $type;
-		} elseif ($lower === 'self' || $lower === 'static') {
-			return $reflection->getDeclaringClass()->name;
-		} elseif ($lower === 'parent' && $reflection->getDeclaringClass()->getParentClass()) {
-			return $reflection->getDeclaringClass()->getParentClass()->name;
-		} else {
-			return $type;
 		}
 	}
 
