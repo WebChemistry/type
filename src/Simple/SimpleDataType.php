@@ -2,7 +2,6 @@
 
 namespace WebChemistry\Type\Simple;
 
-use JetBrains\PhpStorm\ExpectedValues;
 use WebChemistry\Type\Helper\DataTypeHelper;
 
 final class SimpleDataType
@@ -21,10 +20,7 @@ final class SimpleDataType
 		}
 	}
 
-	public function is(
-		#[ExpectedValues(DataTypeHelper::BUILTIN_VALUES)]
-		string $type,
-	): bool
+	public function is(string $type): bool
 	{
 		if ($this->builtin) {
 			if (strcasecmp($this->type, $type) === 0) {
