@@ -34,6 +34,19 @@ final class SimpleDataType
 			return true;
 		}
 
+		return is_a($this->type, $type, true);
+	}
+
+	public function allows(string $type): bool
+	{
+		if ($this->builtin) {
+			if (strcasecmp($this->type, $type) === 0) {
+				return true;
+			}
+
+			return strcasecmp($type, 'null') === 0 && $this->nullable;
+		}
+
 		return is_a($type, $this->type, true);
 	}
 

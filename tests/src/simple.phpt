@@ -13,7 +13,7 @@ function arguments(string ... $types): array
 	return [$types, array_diff($builtin, $types)];
 }
 
-$builder = new AssertBuilder(
+$builderIs = new AssertBuilder(
 	function (string $given, string $accept): void {
 		Assert::true(SimpleDataTypeFactory::fromString($given)->is($accept), sprintf('Trying pass %s to %s.', $accept, $given));
 	},
@@ -22,17 +22,41 @@ $builder = new AssertBuilder(
 	},
 );
 
+$builderAllows = new AssertBuilder(
+	function (string $given, string $accept): void {
+		Assert::true(SimpleDataTypeFactory::fromString($given)->allows($accept), sprintf('Trying pass %s to %s.', $accept, $given));
+	},
+	function (string $given, string $accept): void {
+		Assert::false(SimpleDataTypeFactory::fromString($given)->allows($accept), sprintf('Trying pass %s to %s.', $accept, $given));
+	},
+);
+
 foreach (array_diff(DataTypeHelper::BUILTIN_VALUES, ['null']) as $type) {
-	$builder->add($type . '|null', ...arguments($type, 'null'));
-	$builder->add('null|' . $type, ...arguments($type, 'null'));
-	$builder->add($type, ...arguments($type));
+	$builderIs->add($type . '|null', ...arguments($type, 'null'));
+	$builderAllows->add($type . '|null', ...arguments($type, 'null'));
+	$builderIs->add('null|' . $type, ...arguments($type, 'null'));
+	$builderAllows->add('null|' . $type, ...arguments($type, 'null'));
+	$builderIs->add($type, ...arguments($type));
+	$builderAllows->add($type, ...arguments($type));
 }
 
-$builder->add(stdClass::class, ...arguments('class', stdClass::class));
-$builder->add(DateTimeInterface::class, ...arguments('class', DateTimeInterface::class, DateTime::class, DateTimeImmutable::class));
-$builder->add(DateTime::class, [DateTime::class], [DateTimeInterface::class]);
+enum CustomEnum: string
+{
+	case FOO = 'foo';
+};
 
-$builder->assert();
+class A {} class B extends A {} class C extends B {}
+
+$builderIs->add(C::class, [A::class, B::class, C::class], []);
+$builderAllows->add(C::class, [C::class], [A::class, B::class]);
+
+$builderIs->add(stdClass::class, ...arguments('class', stdClass::class));
+
+$builderIs->add(CustomEnum::class, [BackedEnum::class, CustomEnum::class], []);
+$builderAllows->add(CustomEnum::class, [CustomEnum::class], [BackedEnum::class]);
+
+$builderIs->assert();
+$builderAllows->assert();
 
 Assert::null(SimpleDataTypeFactory::fromString('string|int'));
 Assert::null(SimpleDataTypeFactory::fromString('string&int'));
