@@ -6,13 +6,13 @@ use Nette\Utils\Arrays;
 use WebChemistry\Type\CompoundDataType;
 use WebChemistry\Type\DataType;
 use WebChemistry\Type\DataTypeFactory;
-use WebChemistry\Type\Single\SingleDataTypeAbstract;
+use WebChemistry\Type\SingleDataType;
 
 final class UnionDataType implements CompoundDataType
 {
 
 	/**
-	 * @param SingleDataTypeAbstract[] $types
+	 * @param SingleDataType[] $types
 	 */
 	public function __construct(
 		private array $types,
@@ -109,7 +109,7 @@ final class UnionDataType implements CompoundDataType
 	}
 
 	/**
-	 * @return SingleDataTypeAbstract[]
+	 * @return SingleDataType[]
 	 */
 	public function getSingleTypes(): array
 	{
